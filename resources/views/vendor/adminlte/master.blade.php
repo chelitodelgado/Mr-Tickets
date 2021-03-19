@@ -24,6 +24,7 @@
 
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     {{-- Base Stylesheets --}}
@@ -54,9 +55,9 @@
 
     {{-- Favicon --}}
     @if(config('adminlte.use_ico_only'))
-        <link rel="shortcut icon" href="{{ asset('favicons/favicon.ico') }}" />
+        <link rel="shortcut icon" href="{{ asset('tag.png') }}" />
     @elseif(config('adminlte.use_full_favicon'))
-        <link rel="shortcut icon" href="{{ asset('favicons/favicon.ico') }}" />
+        <link rel="shortcut icon" href="{{ asset('tag.png') }}" />
         <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('favicons/apple-icon-57x57.png') }}">
         <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('favicons/apple-icon-60x60.png') }}">
         <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('favicons/apple-icon-72x72.png') }}">

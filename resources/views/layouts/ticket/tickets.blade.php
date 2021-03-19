@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Tickets')
+@section('title', 'Reportes')
 
 @section('content_header')
     <div class="card mb-4 wow fadeIn animated" style="visibility: visible; animation-name: fadeIn;">
@@ -8,7 +8,7 @@
             <h4 class="mb-2 mb-sm-0 pt-1">
                 <a href="/home">Inicio</a>
                 <span>/</span>
-                <span>Tickets</span>
+                <span>Reportes</span>
             </h4>
         </div>
     </div>
@@ -19,19 +19,19 @@
         <div class="col-12 col-sm-12">
 
             <div class="card-body bg bg-light">
-                <button id="addTicket" class="btn btn-primary">Crear un ticket</button>
+                <button id="addTicket" class="btn btn-primary">Crear un reporte</button>
                 <hr>
                 <table id="tableTicket" class="table ">
                     <thead class="thead-light">
                         <tr>
                             <th>Titulo</th>
                             <th>Descripción</th>
-                            <th>kind_id</th>
-                            <th>user_id</th>
-                            <th>project_id</th>
-                            <th>category_id</th>
-                            <th>priority_id</th>
-                            <th>status_id</th>
+                            <th>Tipo</th>
+                            <th>Usuario</th>
+                            <th>Proyecto</th>
+                            <th>Categoria</th>
+                            <th>Prioridad</th>
+                            <th>Status</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
@@ -53,19 +53,35 @@
     <script>
         $(document).ready( function(){
 
+            // TODO: Render para limitar el numero de caracteres de un campo en espesifico.
+            $.fn.dataTable.render.ellipsis = function ( cutoff ) {
+                return function ( data, type, row ) {
+                    if ( type === 'display' ) {
+                        var str = data.toString(); // cast numbers
+
+                        return str.length < cutoff ?
+                            str :
+                            str.substr(0, cutoff-1) +'&#8230;';
+                    }
+
+                    // Search, order and type can use the original data
+                    return data;
+                };
+            };
+
             $("#tableTicket").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": "{{ route('tickets.index') }}",
                 "columns":[
                     { "data": "title" },
-                    { "data": "description" },
-                    { "data": "kind_id" },
-                    { "data": "user_id" },
-                    { "data": "project_id" },
-                    { "data": "category_id" },
-                    { "data": "priority_id" },
-                    { "data": "status_id" },
+                    { "data": "description", "render": $.fn.dataTable.render.ellipsis( 35 ) },
+                    { "data": "kind" },
+                    { "data": "nombre" },
+                    { "data": "project" },
+                    { "data": "category" },
+                    { "data": "priority" },
+                    { "data": "status" },
                     { "data": "action" }
                 ]
             });
@@ -73,13 +89,12 @@
             /* Abrir ventana modal */
             $('#addTicket').click(function(){
                 $('#ticketForm')[0].reset();
-                $('.modal-title').text("Agregar un nuevo ticket");
+                $('.modal-title').text("Agregar un nuevo reporte");
                 $('#action_button').val("Agregar");
                 $('#action').val("Agregar");
                 $('#ticketModal').modal('show');
             });
 
-            // Agregar nuevo empleado y actualizar
             $('#ticketForm').on('submit', function(event){
                 event.preventDefault();
 
@@ -169,7 +184,7 @@
                         $('#priority_id').val(html.data.priority_id);
                         $('#status_id').val(html.data.status_id);
                         $('#hidden_id').val(html.data.id);
-                        $('.modal-title').text("Editar proyecto");
+                        $('.modal-title').text("Editar reporte");
                         $('#action_button').val("Editar");
                         $('#action').val("Editar");
                         $('#ticketModal').modal('show');
@@ -183,7 +198,7 @@
                 ticket_id = $(this).attr('id');
 
                 Swal.fire({
-                    title: 'Estas seguro de eliminar este ticket?',
+                    title: 'Estas seguro de eliminar este reporte?',
                     showCancelButton: true,
                     confirmButtonText: `Si`,
                 }).then((result) => {
@@ -192,42 +207,13 @@
                             url: 'tickets/destroy/'+ticket_id,
                             success:function(data){
                                 $('#tableTicket').DataTable().ajax.reload();
-                                Swal.fire('Ticket eliminado', '', 'success');
+                                Swal.fire('Reporte eliminado', '', 'success');
                             }
                         });
                     } else if (result.isDenied) {
-                        Swal.fire('Estas seguro de no guardar', '', 'info')
+                        Swal.fire('Estas seguro?', '', 'info')
                     }
                 })
-            });
-
-            $('#kind_id').select2({
-                placeholder: "Selecciona el tipo",
-                allowClear: true,
-                width: "100%",
-                dropdownParent: $('#ticketModal'),
-                tags: "true",
-                allowClear: true
-            });
-            $('#project_id').select2({
-                placeholder: "Asignar proyecto",
-                allowClear: true,
-                width: "100%"
-            });
-            $('#category_id').select2({
-                placeholder: "Selecciona categoria",
-                allowClear: true,
-                width: "100%"
-            });
-            $('#priority_id').select2({
-                placeholder: "Prioridad",
-                allowClear: true,
-                width: "100%"
-            });
-            $('#status_id').select2({
-                placeholder: "Estado",
-                allowClear: true,
-                width: "100%"
             });
 
         });
@@ -238,7 +224,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg bg-light">
-                <h5 class="modal-title">Agregar un nuevo ticket</h5>
+                <h5 class="modal-title">Agregar un nuevo reporte</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -249,51 +235,72 @@
                     <div class="row">
                         <div class="col-md-12">
                             <label class="m-0">Titulo</label>
-                            <input id="title" type="text" class="form-control m-1"
-                                 name="title" placeholder="Titulo" autofocus required />
+                            <input id="title" type="text" class="form-control m-1 @error('title') is-invalid @enderror"
+                                 name="title" value="{{ old('title') }}" placeholder="Titulo" autofocus required />
+                                 @error('title')
+                                    <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
                         </div>
-
                         <div class="col-md-12">
                             <label class="m-0">Descripción:</label>
-                            <textarea name="description" id="description" class="form-control m-1"
-                            rows="2" placeholder="Descripción:" required></textarea>
+                            <textarea name="description" id="description" class="form-control m-1 @error('description') is-invalid @enderror"
+                            rows="2" value="{{ old('description') }}" placeholder="Descripción:" required></textarea>
+                            @error('description')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-
-                        <div class="col-md-6">
-                            <select class="form-control" name="kind_id" id="kind_id" required>
-                                <option></option>
-                                @foreach ($kind as $item)
+                        <div class="col-md-12">
+                            <label class="m-0 @error('user_id') is-invalid @enderror">Asignar a un usuario:</label>
+                            <select class="form-control" name="user_id" id="user_id" required>
+                                <option>Asignar a un usuario</option>
+                                @foreach ($users as $item)
                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                               </select>
+                              @error('user_id')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
+                            <label class="m-0">Asignar proyecto:</label>
                             <select class="form-control" name="project_id" id="project_id" required>
-                                <option></option>
+                                <option>Asignar proyecto</option>
                                 @foreach ($project as $item)
                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                               </select>
                         </div>
                         <div class="col-md-6">
+                            <label class="m-0">Tipo de reporte:</label>
+                            <select class="form-control" name="kind_id" id="kind_id" required>
+                                <option>Seleccione un tipo</option>
+                                @foreach ($kind as $item)
+                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
+                              </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="m-0">Categoria:</label>
                             <select class="form-control" name="category_id" id="category_id" required>
-                                <option></option>
+                                <option>Seleccione una categoria</option>
                                 @foreach ($category as $item)
                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                               </select>
                         </div>
                         <div class="col-md-6">
+                            <label class="m-0">Prioridad:</label>
                             <select class="form-control" name="priority_id" id="priority_id" required>
-                                <option></option>
+                                <option>Seleccione la prioridad</option>
                                 @foreach ($priority as $item)
                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                               </select>
                         </div>
                         <div class="col-md-6">
+                            <label class="m-0">Status:</label>
                             <select class="form-control" name="status_id" id="status_id" required>
-                                <option></option>
+                                <option>Seleccione el status</option>
                                 @foreach ($status as $item)
                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
@@ -301,12 +308,13 @@
                         </div>
 
                     </div>
+                    <hr>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <input type="hidden" name="action" id="action" />
                             <input type="hidden" name="hidden_id" id="hidden_id" />
                             <input type="submit" name="action_button"
-                                id="action_button" class="btn btn-warning" value="Agregar" />
+                                id="action_button" class="btn btn-block btn-primary" value="Agregar" />
                         </div>
                     </div>
                 </form>

@@ -24,14 +24,22 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $topTickets = DB::table('ticket')
+            ->join('category', 'ticket.category_id', '=', 'category.id')
+            ->join('status',   'ticket.status_id',   '=', 'status.id')
+            ->join('project',  'ticket.project_id',  '=', 'project.id')
+            ->select('ticket.*', 'status.name as status', 'project.name as project')
+            ->get();
+
         $tickets  = DB::table('ticket')->count();
         $category = DB::table('category')->count();
         $project  = DB::table('project')->count();
 
         return view('home',[
-            'tickets'  => $tickets,
-            'category' => $category,
-            'project'  => $project
+            'tickets'    => $tickets,
+            'category'   => $category,
+            'project'    => $project,
+            'topTickets' => $topTickets
         ]);
     }
 }

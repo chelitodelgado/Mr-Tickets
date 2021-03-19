@@ -1,50 +1,43 @@
 @extends('adminlte::page')
-
 @section('title', 'Categorias')
-
 @section('content_header')
-<div class="card mb-4 wow fadeIn animated" style="visibility: visible; animation-name: fadeIn;">
-    <div class="card-body d-sm-flex justify-content-between">
-        <h4 class="mb-2 mb-sm-0 pt-1">
-            <a href="/home">Inicio</a>
-            <span>/</span>
-            <span>Categorias</span>
-        </h4>
+    <div class="card mb-4 wow fadeIn animated" style="visibility: visible; animation-name: fadeIn;">
+        <div class="card-body d-sm-flex justify-content-between">
+            <h4 class="mb-2 mb-sm-0 pt-1">
+                <a href="/home">Inicio</a>
+                <span>/</span>
+                <span>Categorias</span>
+            </h4>
+        </div>
     </div>
-</div>
 @stop
-
 @section('content')
+    <div class="row">
+        <div class="col-12 col-sm-12">
 
-<div class="row">
-    <div class="col-12 col-sm-12">
+            <div class="card-body bg bg-light">
+                <button id="addCategory" class="btn btn-primary">Crear categoria</button>
+                <hr>
+                <table id="tableCategory" class="table ">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 40%">Nombre</th>
+                            <th style="width: 50%">Descripción</th>
+                            <th style="width: 10%;" class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
 
-        <div class="card-body bg bg-light">
-            <button id="addCategory" class="btn btn-primary">Crear categoria</button>
-            <hr>
-            <table id="tableCategory" class="table ">
-                <thead class="thead-light">
-                    <tr>
-                        <th style="width: 30%">Nombre</th>
-                        <th style="width: 50%">Descripción</th>
-                        <th style="width: 20%">Acción</th>
-                    </tr>
-                </thead>
-            </table>
         </div>
 
+        <div class="clearfix hidden-md-up"></div>
+
     </div>
-
-    <div class="clearfix hidden-md-up"></div>
-
-</div>
-
 @stop
-
 @section('css')
-    <link rel="stylesheet" href="{{ asset('css/admin_custom.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('css/admin_custom.css') }}"> --}}
 @stop
-
 @section('js')
     <script>
         $(document).ready( function(){
@@ -87,15 +80,14 @@
 
                             if(data.errors){
 
-                                for(var count = 0; count < data.errors.length; count++){
-                                    Swal.fire({
+                                Swal.fire({
                                     icon: 'error',
                                     title: 'Oops...',
-                                    footer: '<p>'+data.errors[count]+'</p>'
-                                    })
-                                }
+                                    footer: '<p>Compruebe los copos</p>'
+                                })
                             }
                             if(data.success){
+
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Categoria agregada correctamente.',
@@ -146,7 +138,6 @@
 
             $(document).on('click', '.edit', function(){
                 var id = $(this).attr('id');
-                // console.log(id);
                 $.ajax({
                     url:"categorias/"+id+"/edit",
                     dataType:"json",
@@ -206,13 +197,23 @@
                         <div class="col-md-12">
                             <label class="m-0">Nombre de la categoria:</label>
                             <input id="name" type="text" class="form-control m-1"
-                                 name="name" placeholder="Nombre:" autofocus required />
+                            name="name" placeholder="Nombre:" value="{{old('name')}}" autofocus required/>
+                            @error('name')
+                                <div class="invalid-feedback">
+                                    <strong>{{$message}}</strong>
+                                </div>
+                            @enderror
                         </div>
 
                         <div class="col-md-12">
                             <label class="m-0">Descripción de la categoria:</label>
-                            <textarea name="description" id="description" class="form-control m-1"
+                            <textarea name="description" id="description" value="{{old('description')}}" class="form-control m-1"
                             rows="3" placeholder="Descripción:" required></textarea>
+                            @error('description')
+                                <div class="invalid-feedback">
+                                    <strong>{{$message}}</strong>
+                                </div>
+                            @enderror
                         </div>
 
                     </div>

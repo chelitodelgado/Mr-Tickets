@@ -18,7 +18,7 @@
     @php( $password_reset_url = $password_reset_url ? url($password_reset_url) : '' )
 @endif
 
-@section('auth_header', __('adminlte::adminlte.login_message'))
+@section('auth_header', 'Inicia sesion')
 
 @section('auth_body')
     <form action="{{ $login_url }}" method="post">
@@ -27,7 +27,7 @@
         {{-- Email field --}}
         <div class="input-group mb-3">
             <input type="email" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                   value="{{ old('email') }}" placeholder="{{ __('adminlte::adminlte.email') }}" autofocus>
+                   value="{{ old('email') }}" placeholder="Email" autofocus>
             <div class="input-group-append">
                 <div class="input-group-text">
                     <span class="fas fa-envelope {{ config('adminlte.classes_auth_icon', '') }}"></span>
@@ -35,7 +35,7 @@
             </div>
             @if($errors->has('email'))
                 <div class="invalid-feedback">
-                    <strong>{{ $errors->first('email') }}</strong>
+                    <strong>El campo email es requerido</strong>
                 </div>
             @endif
         </div>
@@ -43,7 +43,7 @@
         {{-- Password field --}}
         <div class="input-group mb-3">
             <input type="password" name="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
-                   placeholder="{{ __('adminlte::adminlte.password') }}">
+                   placeholder="Contraseña">
             <div class="input-group-append">
                 <div class="input-group-text">
                     <span class="fas fa-lock {{ config('adminlte.classes_auth_icon', '') }}"></span>
@@ -51,7 +51,7 @@
             </div>
             @if($errors->has('password'))
                 <div class="invalid-feedback">
-                    <strong>{{ $errors->first('password') }}</strong>
+                    <strong>El campo contraseña es requerido.</strong>
                 </div>
             @endif
         </div>
@@ -61,13 +61,12 @@
             <div class="col-7">
                 <div class="icheck-primary">
                     <input type="checkbox" name="remember" id="remember">
-                    <label for="remember">{{ __('adminlte::adminlte.remember_me') }}</label>
+                    <label for="remember">Recordar cuenta</label>
                 </div>
             </div>
             <div class="col-5">
                 <button type=submit class="btn btn-block {{ config('adminlte.classes_auth_btn', 'btn-flat btn-primary') }}">
-                    <span class="fas fa-sign-in-alt"></span>
-                    {{ __('adminlte::adminlte.sign_in') }}
+                    Iniciar sesion
                 </button>
             </div>
         </div>
@@ -80,17 +79,17 @@
     @if($password_reset_url)
         <p class="my-0">
             <a href="{{ $password_reset_url }}">
-                {{ __('adminlte::adminlte.i_forgot_my_password') }}
+                Olvide mi contraseña
             </a>
         </p>
     @endif
 
     {{-- Register link --}}
-    @if($register_url)
+    {{-- @if($register_url)
         <p class="my-0">
             <a href="{{ $register_url }}">
                 {{ __('adminlte::adminlte.register_a_new_membership') }}
             </a>
         </p>
-    @endif
+    @endif --}}
 @stop

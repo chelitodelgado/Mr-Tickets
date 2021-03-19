@@ -31,7 +31,7 @@ return [
     */
 
     'use_ico_only' => false,
-    'use_full_favicon' => true,
+    'use_full_favicon' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -45,12 +45,12 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo' => '<b>Mr</b>Tickets',
+    'logo_img' => 'vendor/adminlte/dist/img/report.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'AdminLTE',
+    'logo_img_alt' => 'MrTickets',
 
     /*
     |--------------------------------------------------------------------------
@@ -229,16 +229,21 @@ return [
             'search' => true,
             'topnav' => true,
         ],
-        ['header' => 'Dashboard'],
+        ['header' => 'Administración'],
         [
-            'text' => 'Tickets',
+            'text' => 'Dashboard',
+            'url'  => '/home',
+            'icon' => 'fas fa-fw fa fa-home',
+        ],
+        [
+            'text' => 'Reportes',
             'url'  => 'tickets',
             'icon' => 'fas fa-fw fa-tag',
         ],
         [
             'text' => 'Proyectos',
             'url'  => 'proyectos',
-            'icon' => 'fas fa-fw fa-lock',
+            'icon' => 'fas fa-fw fa-briefcase',
         ],
         [
             'text' => 'Categorias',
@@ -246,9 +251,9 @@ return [
             'icon' => 'fas fa-fw fa-folder',
         ],
         [
-            'text' => 'reportes',
+            'text' => 'Mis reportes',
             'url'  => 'reportes',
-            'icon' => 'fas fa-fw fa-chart-line',
+            'icon' => 'fas fa-fw fa-tags',
         ],
         ['header' => 'Configuración de cuentas'],
         [

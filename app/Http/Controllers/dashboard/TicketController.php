@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class TicketController extends Controller
 {
@@ -16,15 +17,29 @@ class TicketController extends Controller
      */
     public function index()
     {
+
+        $tickets = DB::table('ticket')
+            ->join('category', 'ticket.category_id', '=', 'category.id')
+            ->join('priority', 'ticket.priority_id', '=', 'priority.id')
+            ->join('status',    'ticket.status_id',  '=', 'status.id')
+            ->join('kind',      'ticket.kind_id',    '=', 'kind.id')
+            ->join('users',     'ticket.user_id',    '=', 'users.id')
+            ->join('project',   'ticket.project_id', '=', 'project.id')
+            ->select('ticket.*', 'category.name as category', 'priority.name as priority',
+                     'status.name as status', 'kind.name as kind',
+                     'users.name as nombre', 'project.name as project')
+            ->get();
+
         $kind     = DB::table('kind')->select('id','name')->get();
         $category = DB::table('category')->select('id','name')->get();
         $priority = DB::table('priority')->select('id','name')->get();
         $project  = DB::table('project')->select('id','name')->get();
         $status   = DB::table('status')->select('id','name')->get();
+        $users    = DB::table('users')->select('id','name')->get();
 
         if (request()->ajax()) {
 
-            return datatables()->of(Ticket::latest()->get())
+            return datatables()->of($tickets)
                 ->addColumn('action', function ($data) {
                     $button = '<a style="cursor:pointer; color: green;" name="edit" id="' . $data->id . '"
                     class="edit"><i class="fa fa-edit"></i></a> ';
@@ -39,11 +54,12 @@ class TicketController extends Controller
         }
 
         return view('layouts.ticket.tickets',[
-            "kind"    => $kind,
+            "kind"     => $kind,
             "category" => $category,
             "priority" => $priority,
             "project"  => $project,
-            "status"   => $status
+            "status"   => $status,
+            "users"    => $users
         ]);
     }
 
@@ -65,11 +81,24 @@ class TicketController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate([
+            'title'       => 'required|max:255',
+            'description' => 'required|max:255',
+            'kind_id'     => 'required|min:1',
+            'user_id'     => 'required|min:1',
+            'project_id'  => 'required|min:1',
+            'category_id' => 'required|min:1',
+            'priority_id' => 'required|min:1',
+            'status_id'   => 'required|min:1',
+        ]);
+
         $form_data = array(
-            'title'        => $request->title,
+            'title'       => $request->title,
             'description' => $request->description,
+            'code'        => TicketController::randomCode(8),
             'kind_id'     => $request->kind_id,
-            'user_id'     => 1, //TODO: Asignar el usuario que creo el ticket
+            'user_id'     => $request->user_id,
             'project_id'  => $request->project_id,
             'category_id' => $request->category_id,
             'priority_id' => $request->priority_id,
@@ -120,7 +149,7 @@ class TicketController extends Controller
             'title'       => $request->title,
             'description' => $request->description,
             'kind_id'     => $request->kind_id,
-            'user_id'     => 1, //TODO: Asignar el usuario que creo el ticket
+            'user_id'     => $request->user_id,
             'project_id'  => $request->project_id,
             'category_id' => $request->category_id,
             'priority_id' => $request->priority_id,
@@ -144,4 +173,19 @@ class TicketController extends Controller
         $data = Ticket::findOrFail($id);
         $data->delete();
     }
+
+    public static function randomCode($long) {
+
+        $abcMayus = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+        $code = "";
+
+        for ($i=0; $i < $long; $i++) {
+          $indice = rand(0, (strlen($abcMayus)-1));
+          $code = $code.$abcMayus[$indice];
+        }
+
+        return $code;
+
+    }
+
 }

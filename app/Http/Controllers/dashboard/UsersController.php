@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use Validator;
+use App\Models\User;
+use Facade\FlareClient\Http\Response;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class UsersController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,9 +17,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $users = User::latest()->get();
         if (request()->ajax()) {
 
-            return datatables()->of(Category::latest()->get())
+            return datatables()->of($users)
                 ->addColumn('action', function ($data) {
                     $button = '<a style="cursor:pointer; color: green;" name="edit" id="' . $data->id . '"
                     class="edit"><i class="fa fa-edit"></i></a> ';
@@ -32,7 +34,9 @@ class CategoryController extends Controller
 
         }
 
-        return view('layouts.category.category');
+        return view('layouts.users.usuarios', [
+            'users' => $users
+        ]);
     }
 
     /**
@@ -53,25 +57,44 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //Validaciones
+
+        $users = User::latest()->get();
+
         $request->validate([
-            'name'        => 'required|string',
-            'description' => 'required|string',
+            'name'        => 'required|string|max:255',
+            'username'    => 'required|string|max:255',
+            'email'       => 'required|string|max:255',
+            'password'    => 'required|string|max:255',
+            'status'      => 'required|string|max:255',
+            'role'        => 'required|string|max:255',
+            'profile_pic' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        /* if( $validated ) {
-            return response()->json(['errors' => "error"]);
-        } */
+        if ($request->profile_pic) {
+            $file = $request->file('profile_pic');
+            $imagePath = $request->profile_pic;
+            $imageName = $imagePath->getClientOriginalName();
+
+            // $path = $request->profile_pic->storeAs('uploads', $imageName, 'public');
+            $path = public_path('/fotos');
+            $file->move($path, $imageName);
+
+        }
 
         $form_data = array(
             'name'        => $request->name,
-            'description' => $request->description
+            'username'    => $request->username,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'status'      => $request->status,
+            'role'        => $request->role,
+            'profile_pic' => $imageName
         );
 
-        Category::create($form_data);
+        User::create($form_data);
 
 
-        return response()->json(['success' => 'OK']);
+        return response()->json(['success' => 'OK' ]);
     }
 
     /**
@@ -93,9 +116,8 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        // Busqueda de la categoria por id
         if ( request()->ajax() ) {
-            $data = Category::findOrFail($id);
+            $data = User::findOrFail($id);
             return response()->json(['data' => $data]);
         }
     }
@@ -109,25 +131,29 @@ class CategoryController extends Controller
      */
     public function update(Request $request)
     {
-        //Validaciones
-        $rules = array(
-            'name'        => 'required|string|max:100',
-            'description' => 'required|string|max:255'
-        );
 
-        $error = Validator::make( $request->all(), $rules );
+        if ($request->profile_pic) {
+            $file = $request->file('profile_pic');
+            $imagePath = $request->profile_pic;
+            $imageName = $imagePath->getClientOriginalName();
 
-        if ($error->fails()) {
-            return response()->json(['errors' => $error->errors()->all()]);
+            // $path = $request->profile_pic->storeAs('uploads', $imageName, 'public');
+            $path = public_path('/fotos');
+            $file->move($path, $imageName);
+
         }
 
         $form_data = array(
             'name'        => $request->name,
-            'description' => $request->description
+            'username'    => $request->username,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'status'      => $request->status,
+            'role'        => $request->role,
+            'profile_pic' => $imageName
         );
 
-        Category::whereId($request->hidden_id)->update($form_data);
-
+        User::whereId($request->hidden_id)->update($form_data);
 
         return response()->json(['success' => 'OK']);
     }
@@ -140,8 +166,16 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        // Eliminando la categori por id
-        $data = Category::findOrFail($id);
+        $data = User::findOrFail($id);
         $data->delete();
     }
+
+    public function getUsers(){
+
+        $users = User::latest()->get();
+
+        return Response()->json(['data' => $users]);
+    }
+
+
 }
