@@ -32,6 +32,8 @@ DB_PASSWORD="Contraseña de no tener dejar vacio"
     $ php artisan key:generate
 ### Crear las migraciones y los seeder a la base de datos de Mysql:
     $ php artisan migrate
+### Crear las migraciones y los seeder a la base de datos de Mysql:
+    $ php artisan serve
 
 
 ## Mis redes sociales
